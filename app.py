@@ -14,7 +14,7 @@ app.secret_key = 'factures_secret_key'
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-DATA_FILE = 'data.json'
+DATA_FILE = "/data/data.json"
 ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
 ADMIN_PASSWORD = 'Lv15052025@@'
 
