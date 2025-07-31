@@ -95,3 +95,26 @@ input[name="commentaire"] {
     color: orange;
     font-weight: bold;
 }
+
+.statut-btn {
+    padding: 8px 12px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-green {
+    background-color: #28a745;
+}
+
+.btn-orange {
+    background-color: #ff9800;
+}
+
+.btn-red {
+    background-color: #e53935;
+}
+
