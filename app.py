@@ -103,6 +103,8 @@ def admin():
                         data[index]['statut'] = request.form.get('statut')
                         data[index]['commentaire'] = request.form.get('commentaire')
                     save_data(data)
+            except Exception as e:
+                print('Erreur lors de la suppression ou mise à jour :', e)
                 pass
             data.pop(index)
         else:
