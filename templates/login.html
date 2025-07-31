@@ -1,13 +1,17 @@
-
 <!doctype html>
 <html>
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"><meta charset="utf-8"><title>Connexion Admin</title></head>
+    <meta charset="utf-8">
+    <title>Connexion Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
 <body>
-    <h2>Connexion à l'interface admin</h2>
+    <h2>Connexion</h2>
     <form method="POST">
-        <input name="login" placeholder="Identifiant"><br>
-        <input name="password" type="password" placeholder="Mot de passe"><br>
+        <label for="username">Identifiant :</label><br>
+        <input type="text" name="username" id="username" required><br><br>
+        <label for="password">Mot de passe :</label><br>
+        <input type="password" name="password" id="password" required><br><br>
         <button type="submit">Se connecter</button>
     </form>
 </body>
