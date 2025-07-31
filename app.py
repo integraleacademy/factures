@@ -86,13 +86,23 @@ def admin():
     data = load_data()
 
     if request.method == 'POST':
-        action = request.form.get('action')
-        index = int(request.form.get('index'))
-        if action == 'delete':
-            fichier = data[index]['fichier']
+        index = request.form.get('index')
+        if index is not None:
             try:
-                os.remove(os.path.join(UPLOAD_FOLDER, fichier))
-            except:
+                index = int(index)
+                if 0 <= index < len(data):
+                    if action == 'delete':
+                        fichier = data[index].get('fichier')
+                        if fichier:
+                            try:
+                                os.remove(os.path.join(UPLOAD_FOLDER, fichier))
+                            except:
+                                pass
+                        data.pop(index)
+                    else:
+                        data[index]['statut'] = request.form.get('statut')
+                        data[index]['commentaire'] = request.form.get('commentaire')
+                    save_data(data)
                 pass
             data.pop(index)
         else:
