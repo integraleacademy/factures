@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -10,7 +9,18 @@
     <h2>Factures reçues</h2>
     <a href="/logout">Déconnexion</a>
     <table border="1">
-        <tr><th>Date</th><th>Nom</th><th>Email</th><th>N° Facture</th><th>Montant</th><th>Date facture</th><th>Fichier</th><th>Statut</th><th>Commentaire</th><th>Actions</th></tr>
+        <tr>
+            <th>Date</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>N° Facture</th>
+            <th>Montant</th>
+            <th>Date facture</th>
+            <th>Fichier</th>
+            <th>Statut</th>
+            <th>Commentaire</th>
+            <th>Actions</th>
+        </tr>
         {% for facture in factures %}
         {% set i = loop.index0 %}
         <form method="POST">
@@ -23,16 +33,15 @@
             <td>{{ facture.date_facture }}</td>
             <td><a href="{{ url_for('download_facture', filename=facture.fichier) }}">Télécharger</a></td>
             <td>
-                <select name="statut">
-                    <option {% if facture.statut=='En attente' %}selected{% endif %}>En attente</option>
-                    <option {% if facture.statut=='Payée' %}selected{% endif %}>Payée</option>
-                    <option {% if facture.statut=='Non payée' %}selected{% endif %}>Non payée</option>
-                </select>
+                <input type="hidden" name="statut" value="Payée">
+                <button type="submit" name="action" value="update"
+                    class="statut-btn {% if facture.statut=='Payée' %}btn-green{% elif facture.statut=='Non payée' %}btn-red{% else %}btn-orange{% endif %}">
+                    {{ facture.statut }}
+                </button>
             </td>
             <td><input name="commentaire" value="{{ facture.commentaire }}"></td>
             <td>
                 <input type="hidden" name="index" value="{{ i }}">
-                <button name="action" value="update">💾</button>
                 <button name="action" value="delete">🗑️</button>
             </td>
         </tr>
