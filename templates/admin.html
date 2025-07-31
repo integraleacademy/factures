@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -10,7 +9,18 @@
     <h2>Factures reçues</h2>
     <a href="/logout">Déconnexion</a>
     <table border="1">
-        <tr><th>Date</th><th>Nom</th><th>Email</th><th>N° Facture</th><th>Montant</th><th>Date facture</th><th>Fichier</th><th>Statut</th><th>Commentaire</th><th>Actions</th></tr>
+        <tr>
+            <th>Date</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>N° Facture</th>
+            <th>Montant</th>
+            <th>Date facture</th>
+            <th>Fichier</th>
+            <th>Statut</th>
+            <th>Commentaire</th>
+            <th>Actions</th>
+        </tr>
         {% for facture in factures %}
         {% set i = loop.index0 %}
         <form method="POST">
@@ -32,7 +42,15 @@
             <td><input name="commentaire" value="{{ facture.commentaire }}"></td>
             <td>
                 <input type="hidden" name="index" value="{{ i }}">
-                <button name="action" value="update">💾</button>
+                <button name="action" value="update"
+                        style="background-color:
+                            {% if facture.statut == 'Payée' %}lightgreen
+                            {% elif facture.statut == 'Non payée' %}salmon
+                            {% elif facture.statut == 'En attente' %}orange
+                            {% else %}lightgray{% endif %};
+                            border: none; padding: 5px 10px;">
+                    💾
+                </button>
                 <button name="action" value="delete">🗑️</button>
             </td>
         </tr>
