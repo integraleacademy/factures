@@ -1,6 +1,6 @@
 
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, send_file, session
 import os
 import json
 from datetime import datetime
@@ -116,7 +116,10 @@ def logout():
 
 @app.route('/download/<filename>')
 def download(filename):
-    return redirect(url_for('static', filename=f'uploads/{filename}'))
+    full_path = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(full_path):
+        return send_file(full_path)
+    return 'Fichier introuvable', 404
     return f"Fichier non trouvé : {filename}", 404
 
 if __name__ == '__main__':
