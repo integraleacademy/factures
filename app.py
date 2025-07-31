@@ -8,11 +8,11 @@ import smtplib
 from email.message import EmailMessage
 
 DATA_FILE = "/data/data.json"
+UPLOAD_FOLDER = "/data/uploads"
 
 app = Flask(__name__)
 app.secret_key = 'factures_secret_key'
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
@@ -122,7 +122,7 @@ def logout():
 
 @app.route('/download/<filename>')
 def download_facture(filename):
-    return redirect(url_for('static', filename=f'uploads/{filename}'))
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
