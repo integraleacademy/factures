@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 <head>
@@ -22,7 +23,6 @@
             <th>Actions</th>
         </tr>
         {% for facture in factures %}
-        {% set i = loop.index0 %}
         <form method="POST">
         <tr>
             <td>{{ facture.date_envoi }}</td>
@@ -41,7 +41,7 @@
             </td>
             <td><input name="commentaire" value="{{ facture.commentaire }}"></td>
             <td>
-                <input type="hidden" name="index" value="{{ i }}">
+                <input type="hidden" name="fichier" value="{{ facture.fichier }}">
                 <button name="action" value="update"
                         style="background-color:
                             {% if facture.statut == 'Payée' %}lightgreen
