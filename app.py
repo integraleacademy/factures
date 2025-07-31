@@ -1,6 +1,6 @@
 
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session
+from flask import send_file, Flask, render_template, request, redirect, url_for, send_from_directory, session
 import os
 import json
 from datetime import datetime
@@ -14,7 +14,7 @@ app.secret_key = 'factures_secret_key'
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-DATA_FILE = "/data/data.json"
+DATA_FILE = 'data.json'
 ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
 ADMIN_PASSWORD = 'Lv15052025@@'
 
@@ -121,3 +121,13 @@ def download(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+@app.route("/download/<filename>")
+def download(filename):
+    path = os.path.join("/data", filename)
+    if os.path.exists(path):
+        return send_file(path, as_attachment=True)
+    else:
+        return "Fichier introuvable", 404
