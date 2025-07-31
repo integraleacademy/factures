@@ -14,7 +14,12 @@ app.secret_key = 'factures_secret_key'
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-DATA_FILE = 'data.json'
+DATA_FILE = "/data/data.json"
+
+# Crée un fichier vide si data.json n'existe pas encore
+if not os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "w") as f:
+        json.dump([], f)
 ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
 ADMIN_PASSWORD = 'Lv15052025@@'
 
@@ -115,19 +120,9 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/download/<filename>')
-def download(filename):
+def download_facture(filename):
     return redirect(url_for('static', filename=f'uploads/{filename}'))
     return f"Fichier non trouvé : {filename}", 404
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-@app.route("/download/<filename>")
-def download_facture(filename):
-    path = os.path.join("/data", filename)
-    if os.path.exists(path):
-        return send_file(path, as_attachment=True)
-    else:
-        return "Fichier introuvable", 404
