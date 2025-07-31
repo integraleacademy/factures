@@ -115,9 +115,7 @@ def logout():
 
 @app.route('/download/<filename>')
 def download(filename):
-    full_path = os.path.join(UPLOAD_FOLDER, filename)
-    if os.path.exists(full_path):
-        return send_from_directory(UPLOAD_FOLDER, filename)
+    return redirect(url_for('static', filename=f'uploads/{filename}'))
     return f"Fichier non trouvé : {filename}", 404
 
 if __name__ == '__main__':
