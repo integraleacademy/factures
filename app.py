@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
 
 @app.route("/download/<filename>")
-def download(filename):
+def download_facture(filename):
     path = os.path.join("/data", filename)
     if os.path.exists(path):
         return send_file(path, as_attachment=True)
