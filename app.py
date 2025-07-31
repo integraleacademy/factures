@@ -1,19 +1,6 @@
-
-
-
 import os
 import json
-
-DATA_FILE = "/data/data.json"
-
-# Crée un fichier vide si data.json n'existe pas encore
-if not os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "w") as f:
-        json.dump([], f)
-
 from flask import send_file, Flask, render_template, request, redirect, url_for, send_from_directory, session
-import os
-import json
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import smtplib
@@ -22,16 +9,19 @@ from email.message import EmailMessage
 app = Flask(__name__)
 app.secret_key = 'factures_secret_key'
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+DATA_FILE = "/data/data.json"
+UPLOAD_FOLDER = "/data"
+
+# Crée le dossier /data si nécessaire
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
-ADMIN_PASSWORD = 'Lv15052025@@'
-
+# Crée le fichier data.json s’il n’existe pas
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, 'w') as f:
         json.dump([], f)
+
+ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
+ADMIN_PASSWORD = 'Lv15052025@@'
 
 def load_data():
     with open(DATA_FILE, 'r') as f:
@@ -127,8 +117,10 @@ def logout():
 
 @app.route('/download/<filename>')
 def download_facture(filename):
-    return redirect(url_for('static', filename=f'uploads/{filename}'))
-    return f"Fichier non trouvé : {filename}", 404
+    path = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(path):
+        return send_file(path, as_attachment=True)
+    return "Fichier introuvable", 404
 
 if __name__ == '__main__':
     app.run(debug=True)
