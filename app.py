@@ -1,3 +1,4 @@
+
 import os
 import json
 from flask import send_file, Flask, render_template, request, redirect, url_for, send_from_directory, session
@@ -6,22 +7,20 @@ from werkzeug.utils import secure_filename
 import smtplib
 from email.message import EmailMessage
 
+DATA_FILE = "/data/data.json"
+
 app = Flask(__name__)
 app.secret_key = 'factures_secret_key'
 
-DATA_FILE = "/data/data.json"
-UPLOAD_FOLDER = "/data"
-
-# Crée le dossier /data si nécessaire
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-# Crée le fichier data.json s’il n’existe pas
-if not os.path.exists(DATA_FILE):
-    with open(DATA_FILE, 'w') as f:
-        json.dump([], f)
 
 ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
 ADMIN_PASSWORD = 'Lv15052025@@'
+
+if not os.path.exists(DATA_FILE):
+    with open(DATA_FILE, 'w') as f:
+        json.dump([], f)
 
 def load_data():
     with open(DATA_FILE, 'r') as f:
@@ -87,18 +86,24 @@ def admin():
 
     if request.method == 'POST':
         action = request.form.get('action')
-        index = int(request.form.get('index'))
-        if action == 'delete':
-            fichier = data[index]['fichier']
-            try:
-                os.remove(os.path.join(UPLOAD_FOLDER, fichier))
-            except:
-                pass
-            data.pop(index)
-        else:
-            data[index]['statut'] = request.form.get('statut')
-            data[index]['commentaire'] = request.form.get('commentaire')
-        save_data(data)
+        fichier_recu = request.form.get('fichier')
+        data_modifiee = []
+
+        for facture in data:
+            if facture['fichier'] == fichier_recu:
+                if action == 'delete':
+                    try:
+                        os.remove(os.path.join(UPLOAD_FOLDER, facture['fichier']))
+                    except:
+                        pass
+                    continue
+                else:
+                    facture['statut'] = request.form.get('statut')
+                    facture['commentaire'] = request.form.get('commentaire')
+            data_modifiee.append(facture)
+
+        save_data(data_modifiee)
+        data = data_modifiee
 
     return render_template('admin.html', factures=data)
 
@@ -117,10 +122,7 @@ def logout():
 
 @app.route('/download/<filename>')
 def download_facture(filename):
-    path = os.path.join(UPLOAD_FOLDER, filename)
-    if os.path.exists(path):
-        return send_file(path, as_attachment=True)
-    return "Fichier introuvable", 404
+    return redirect(url_for('static', filename=f'uploads/{filename}'))
 
 if __name__ == '__main__':
     app.run(debug=True)
