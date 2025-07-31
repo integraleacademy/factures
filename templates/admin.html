@@ -1,0 +1,43 @@
+
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="utf-8">
+    <title>Admin - Factures</title>
+</head>
+<body>
+    <h2>Factures reçues</h2>
+    <a href="/logout">Déconnexion</a>
+    <table border="1">
+        <tr><th>Date</th><th>Nom</th><th>Email</th><th>N° Facture</th><th>Montant</th><th>Date facture</th><th>Fichier</th><th>Statut</th><th>Commentaire</th><th>Actions</th></tr>
+        {% for facture in factures %}
+        {% set i = loop.index0 %}
+        <form method="POST">
+        <tr>
+            <td>{{ facture.date_envoi }}</td>
+            <td>{{ facture.nom }}</td>
+            <td>{{ facture.email }}</td>
+            <td>{{ facture.numero }}</td>
+            <td>{{ facture.montant }}</td>
+            <td>{{ facture.date_facture }}</td>
+            <td><a href="{{ url_for('download', filename=facture.fichier) }}">Télécharger</a></td>
+            <td>
+                <select name="statut">
+                    <option {% if facture.statut=='En attente' %}selected{% endif %}>En attente</option>
+                    <option {% if facture.statut=='Payée' %}selected{% endif %}>Payée</option>
+                    <option {% if facture.statut=='Non payée' %}selected{% endif %}>Non payée</option>
+                </select>
+            </td>
+            <td><input name="commentaire" value="{{ facture.commentaire }}"></td>
+            <td>
+                <input type="hidden" name="index" value="{{ i }}">
+                <button name="action" value="update">💾</button>
+                <button name="action" value="delete">🗑️</button>
+            </td>
+        </tr>
+        </form>
+        {% endfor %}
+    </table>
+</body>
+</html>
