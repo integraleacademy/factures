@@ -96,14 +96,17 @@ input[name="commentaire"] {
     font-weight: bold;
 }
 
-.statut-btn {
-    padding: 8px 12px;
+
+/* Statut en couleur (menu déroulant stylisé) */
+.statut-select {
     font-weight: bold;
     color: white;
     border: none;
     border-radius: 6px;
+    padding: 8px 12px;
     cursor: pointer;
     width: 100%;
+    text-align: center;
 }
 
 .btn-green {
@@ -117,4 +120,3 @@ input[name="commentaire"] {
 .btn-red {
     background-color: #e53935;
 }
-
