@@ -1,67 +1,44 @@
-
+from flask import Flask, render_template, request, redirect, send_from_directory, url_for, session
 import os
 import json
-from flask import send_file, Flask, render_template, request, redirect, url_for, send_from_directory, session
 from datetime import datetime
 from werkzeug.utils import secure_filename
-import smtplib
-from email.message import EmailMessage
-
-DATA_FILE = "/data/data.json"
-UPLOAD_FOLDER = "/data/uploads"
 
 app = Flask(__name__)
-app.secret_key = 'factures_secret_key'
+app.secret_key = 'votre_clef_secrete'
+UPLOAD_FOLDER = 'static/uploads'
+DATA_FILE = '/data/factures.json'
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
-ADMIN_PASSWORD = 'Lv15052025@@'
-
-if not os.path.exists(DATA_FILE):
-    with open(DATA_FILE, 'w') as f:
-        json.dump([], f)
-
 def load_data():
-    with open(DATA_FILE, 'r') as f:
-        return json.load(f)
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    return []
 
 def save_data(data):
     with open(DATA_FILE, 'w') as f:
-        json.dump(data, f, indent=4)
-
-def send_mail(nom, email, filename):
-    msg = EmailMessage()
-    msg['Subject'] = 'Nouvelle facture déposée'
-    msg['From'] = 'ecole@integraleacademy.com'
-    msg['To'] = 'ecole@integraleacademy.com'
-    msg.set_content("Une nouvelle facture a été déposée par {} ({}). Fichier : {}".format(nom, email, filename))
-
-    try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-            smtp.login('ecole@integraleacademy.com', os.environ.get('EMAIL_PASSWORD'))
-            smtp.send_message(msg)
-    except Exception as e:
-        print("Erreur envoi mail :", e)
+        json.dump(data, f)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        nom = request.form['nom']
-        email = request.form['email']
-        numero = request.form['numero']
-        montant = request.form['montant']
-        date_facture = request.form['date']
         fichier = request.files['fichier']
-
         if fichier:
-            filename = datetime.now().strftime("%Y%m%d%H%M%S_") + secure_filename(fichier.filename)
+            nom = request.form['nom']
+            email = request.form['email']
+            numero = request.form['numero']
+            montant = request.form['montant']
+            date_facture = request.form['date_facture']
+            now = datetime.now().strftime('%Y%m%d%H%M%S')
+            filename = now + "_" + secure_filename(fichier.filename)
             filepath = os.path.join(UPLOAD_FOLDER, filename)
             fichier.save(filepath)
 
             data = load_data()
             data.append({
-                'date_envoi': datetime.now().strftime('%Y-%m-%d %H:%M'),
+                'date_envoi': now,
                 'nom': nom,
                 'email': email,
                 'numero': numero,
@@ -72,57 +49,51 @@ def index():
                 'commentaire': ''
             })
             save_data(data)
-            send_mail(nom, email, filename)
-            return render_template('confirmation.html')
-
+            return render_template('index.html', message="Votre facture a bien été envoyée.")
     return render_template('index.html')
 
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-
-    data = load_data()
-
-    if request.method == 'POST':
-        action = request.form.get('action')
-        fichier_recu = request.form.get('fichier')
-        data_modifiee = []
-
-        for facture in data:
-            if facture['fichier'] == fichier_recu:
-                if action == 'delete':
-                    try:
-                        os.remove(os.path.join(UPLOAD_FOLDER, facture['fichier']))
-                    except:
-                        pass
-                    continue
-                else:
-                    facture['statut'] = request.form.get('statut')
-                    facture['commentaire'] = request.form.get('commentaire')
-            data_modifiee.append(facture)
-
-        save_data(data_modifiee)
-        data = data_modifiee
-
-    return render_template('admin.html', factures=data)
+@app.route('/download/<filename>')
+def download_facture(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.form['login'] == ADMIN_LOGIN and request.form['password'] == ADMIN_PASSWORD:
-            session['logged_in'] = True
-            return redirect(url_for('admin'))
+        if request.form['username'] == 'admin' and request.form['password'] == 'motdepasse':
+            session['admin'] = True
+            return redirect('/admin')
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
-    session.clear()
-    return redirect(url_for('login'))
+    session.pop('admin', None)
+    return redirect('/login')
 
-@app.route('/download/<filename>')
-def download_facture(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if not session.get('admin'):
+        return redirect('/login')
+
+    data = load_data()
+
+    if request.method == 'POST':
+        index = int(request.form['index'])
+        action = request.form['action']
+
+        if action == 'update':
+            data[index]['statut'] = request.form['statut']
+            data[index]['commentaire'] = request.form['commentaire']
+        elif action == 'delete':
+            fichier = data[index]['fichier']
+            try:
+                os.remove(os.path.join(UPLOAD_FOLDER, fichier))
+            except:
+                pass
+            data.pop(index)
+        save_data(data)
+        return redirect('/admin')
+
+    return render_template('admin.html', factures=data)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000)
