@@ -1,5 +1,16 @@
 
 
+
+import os
+import json
+
+DATA_FILE = "/data/data.json"
+
+# Crée un fichier vide si data.json n'existe pas encore
+if not os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "w") as f:
+        json.dump([], f)
+
 from flask import send_file, Flask, render_template, request, redirect, url_for, send_from_directory, session
 import os
 import json
@@ -14,12 +25,7 @@ app.secret_key = 'factures_secret_key'
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-DATA_FILE = "/data/data.json"
 
-# Crée un fichier vide si data.json n'existe pas encore
-if not os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "w") as f:
-        json.dump([], f)
 ADMIN_LOGIN = 'integralesecuriteformations@gmail.com'
 ADMIN_PASSWORD = 'Lv15052025@@'
 
