@@ -12,10 +12,8 @@ app.secret_key = 'factures_secret_key'
 DATA_FILE = "/data/data.json"
 UPLOAD_FOLDER = "/data"
 
-# Crée le dossier /data si nécessaire
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Crée le fichier data.json s’il n’existe pas
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, 'w') as f:
         json.dump([], f)
@@ -36,7 +34,7 @@ def send_mail(nom, email, filename):
     msg['Subject'] = 'Nouvelle facture déposée'
     msg['From'] = 'ecole@integraleacademy.com'
     msg['To'] = 'ecole@integraleacademy.com'
-    msg.set_content("Une nouvelle facture a été déposée par {} ({}). Fichier : {}".format(nom, email, filename))
+    msg.set_content(f"Une nouvelle facture a été déposée par {nom} ({email}). Fichier : {filename}")
 
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
@@ -84,35 +82,32 @@ def admin():
         return redirect(url_for('login'))
 
     data = load_data()
-    # Trier les factures : Non payée et En attente en haut, Payée en bas
     data.sort(key=lambda x: 0 if x['statut'] in ['Non payée', 'En attente'] else 1)
 
     if request.method == 'POST':
         action = request.form.get('action')
-        index = int(request.form.get('index'))
-        if action == 'delete':
-            fichier = data[index]['fichier']
-            try:
-                os.remove(os.path.join(UPLOAD_FOLDER, fichier))
-            except Exception as e:
-                print("Erreur suppression fichier :", e)
-            data.pop(index)
-            save_data(data)
-            return redirect(url_for('admin'))
+        fichier_cible = request.form.get('fichier')
 
-        elif action == 'update_statut':
-            new_statut = request.form.get('statut')
-            data[index]['statut'] = new_statut
-            save_data(data)
-            return redirect(url_for('admin'))
+        for facture in data:
+            if facture['fichier'] == fichier_cible:
+                if action == 'delete':
+                    try:
+                        os.remove(os.path.join(UPLOAD_FOLDER, facture['fichier']))
+                    except Exception as e:
+                        print("Erreur suppression fichier :", e)
+                    data.remove(facture)
+                    break
+                elif action == 'update_statut':
+                    facture['statut'] = request.form.get('statut')
+                    break
+                elif action == 'update_commentaire':
+                    facture['commentaire'] = request.form.get('commentaire')
+                    break
 
-        elif action == 'update_commentaire':
-            new_commentaire = request.form.get('commentaire')
-            data[index]['commentaire'] = new_commentaire
-            save_data(data)
-            return redirect(url_for('admin'))
+        save_data(data)
+        return redirect(url_for('admin'))
 
-    return render_template('admin.html', data=data)
+    return render_template('admin.html', factures=data)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -130,7 +125,7 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/download/<filename>')
-def download(filename):
+def download_facture(filename):
     return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
 
 if __name__ == '__main__':
