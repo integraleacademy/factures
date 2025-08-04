@@ -84,50 +84,54 @@ def admin():
         return redirect(url_for('login'))
 
     data = load_data()
+    # Trier les factures : Non payée et En attente en haut, Payée en bas
+    data.sort(key=lambda x: 0 if x['statut'] in ['Non payée', 'En attente'] else 1)
 
     if request.method == 'POST':
         action = request.form.get('action')
-        index = request.form.get('index')
-        if index is not None:
+        index = int(request.form.get('index'))
+        if action == 'delete':
+            fichier = data[index]['fichier']
             try:
-                index = int(index)
-                if 0 <= index < len(data):
-                    if action == 'delete':
-                        fichier = data[index].get('fichier')
-                        if fichier:
-                            try:
-                                os.remove(os.path.join(UPLOAD_FOLDER, fichier))
-                            except:
-                                pass
-                        data.pop(index)
-                    else:
-                        data[index]['statut'] = request.form.get('statut')
-                        data[index]['commentaire'] = request.form.get('commentaire')
-                    save_data(data)
+                os.remove(os.path.join(UPLOAD_FOLDER, fichier))
             except Exception as e:
-                print("Erreur lors de la suppression ou mise à jour :", e)
+                print("Erreur suppression fichier :", e)
+            data.pop(index)
+            save_data(data)
+            return redirect(url_for('admin'))
 
-    return render_template('admin.html', factures=data)
+        elif action == 'update_statut':
+            new_statut = request.form.get('statut')
+            data[index]['statut'] = new_statut
+            save_data(data)
+            return redirect(url_for('admin'))
+
+        elif action == 'update_commentaire':
+            new_commentaire = request.form.get('commentaire')
+            data[index]['commentaire'] = new_commentaire
+            save_data(data)
+            return redirect(url_for('admin'))
+
+    return render_template('admin.html', data=data)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.form['login'] == ADMIN_LOGIN and request.form['password'] == ADMIN_PASSWORD:
+        email = request.form['email']
+        password = request.form['password']
+        if email == ADMIN_LOGIN and password == ADMIN_PASSWORD:
             session['logged_in'] = True
             return redirect(url_for('admin'))
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
-    session.clear()
+    session.pop('logged_in', None)
     return redirect(url_for('login'))
 
 @app.route('/download/<filename>')
-def download_facture(filename):
-    path = os.path.join(UPLOAD_FOLDER, filename)
-    if os.path.exists(path):
-        return send_file(path, as_attachment=True)
-    return "Fichier introuvable", 404
+def download(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
