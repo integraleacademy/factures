@@ -85,6 +85,33 @@ def admin():
     data.sort(key=lambda x: 0 if x['statut'] in ['Non payée', 'En attente'] else 1)
 
     if request.method == 'POST':
+        if request.form.get('action') == 'add_manual':
+            nom = request.form['nom']
+            email = request.form['email']
+            numero = request.form['numero']
+            montant = request.form['montant']
+            date_facture = request.form['date_facture']
+            statut = request.form['statut']
+            commentaire = request.form.get('commentaire', '')
+            fichier = request.files['fichier']
+            if fichier:
+                filename = datetime.now().strftime("%Y%m%d%H%M%S_") + secure_filename(fichier.filename)
+                filepath = os.path.join(UPLOAD_FOLDER, filename)
+                fichier.save(filepath)
+                data.append({
+                    'date_envoi': datetime.now().strftime('%Y-%m-%d %H:%M'),
+                    'nom': nom,
+                    'email': email,
+                    'numero': numero,
+                    'montant': montant,
+                    'date_facture': date_facture,
+                    'fichier': filename,
+                    'statut': statut,
+                    'commentaire': commentaire
+                })
+                save_data(data)
+                return redirect(url_for('admin'))
+
         action = request.form.get('action')
         fichier_cible = request.form.get('fichier')
 
