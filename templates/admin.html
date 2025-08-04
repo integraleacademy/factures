@@ -4,10 +4,62 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <meta charset="utf-8">
     <title>Admin - Factures</title>
+    <style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    </style>
 </head>
 <body>
-    <h2>Factures reçues</h2>
-    <a href="/logout">Déconnexion</a>
+    <h2 style="display: inline-block;">Factures reçues</h2>
+    <a href="/logout" style="float: left; margin: 10px;">Déconnexion</a>
+    <button onclick="document.getElementById('addModal').style.display='block'" style="float:right; margin: 10px;">➕ Ajouter une facture</button>
+
+    <div id="addModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="document.getElementById('addModal').style.display='none'">&times;</span>
+        <h3>Ajouter une facture manuellement</h3>
+        <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="action" value="add_manual">
+          <input type="text" name="nom" placeholder="Nom" required>
+          <input type="email" name="email" placeholder="Email" required>
+          <input type="text" name="numero" placeholder="N° de facture" required>
+          <input type="text" name="montant" placeholder="Montant" required>
+          <input type="date" name="date_facture" required>
+          <select name="statut" required>
+            <option value="En attente">En attente</option>
+            <option value="Payée">Payée</option>
+            <option value="Non payée">Non payée</option>
+          </select>
+          <input type="text" name="commentaire" placeholder="Commentaire (facultatif)">
+          <input type="file" name="fichier" required>
+          <button type="submit">Ajouter</button>
+        </form>
+      </div>
+    </div>
+
     <table border="1">
         <tr>
             <th>Date</th>
@@ -30,9 +82,7 @@
             <td>{{ facture.numero }}</td>
             <td>{{ facture.montant }}</td>
             <td>{{ facture.date_facture }}</td>
-            <td>
-                <a href="{{ url_for('download_facture', filename=facture.fichier) }}">Télécharger</a>
-            </td>
+            <td><a href="{{ url_for('download_facture', filename=facture.fichier) }}">Télécharger</a></td>
             <td>
                 <select name="statut"
                     class="statut-select 
@@ -44,9 +94,7 @@
                     <option {% if facture.statut=='Non payée' %}selected{% endif %}>Non payée</option>
                 </select>
             </td>
-            <td>
-                <input name="commentaire" value="{{ facture.commentaire }}">
-            </td>
+            <td><input name="commentaire" value="{{ facture.commentaire }}"></td>
             <td>
                 <input type="hidden" name="fichier" value="{{ facture.fichier }}">
                 <button name="action" value="update_statut">💾</button>
@@ -57,5 +105,14 @@
         </form>
         {% endfor %}
     </table>
+
+    <script>
+    window.onclick = function(event) {
+        var modal = document.getElementById('addModal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    </script>
 </body>
 </html>
