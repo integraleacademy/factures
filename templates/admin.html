@@ -9,7 +9,18 @@
     <h2>Factures reçues</h2>
     <a href="/logout">Déconnexion</a>
     <table border="1">
-        <tr><th>Date</th><th>Nom</th><th>Email</th><th>N° Facture</th><th>Montant</th><th>Date facture</th><th>Fichier</th><th>Statut</th><th>Commentaire</th><th>Actions</th></tr>
+        <tr>
+            <th>Date</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>N° Facture</th>
+            <th>Montant</th>
+            <th>Date facture</th>
+            <th>Fichier</th>
+            <th>Statut</th>
+            <th>Commentaire</th>
+            <th>Actions</th>
+        </tr>
         {% for facture in factures %}
         <form method="POST">
         <tr>
@@ -19,15 +30,23 @@
             <td>{{ facture.numero }}</td>
             <td>{{ facture.montant }}</td>
             <td>{{ facture.date_facture }}</td>
-            <td><a href="{{ url_for('download_facture', filename=facture.fichier) }}">Télécharger</a></td>
             <td>
-                <select name="statut">
+                <a href="{{ url_for('download_facture', filename=facture.fichier) }}">Télécharger</a>
+            </td>
+            <td>
+                <select name="statut"
+                    class="statut-select 
+                    {% if facture.statut == 'Payée' %}btn-green
+                    {% elif facture.statut == 'En attente' %}btn-orange
+                    {% elif facture.statut == 'Non payée' %}btn-red{% endif %}">
                     <option {% if facture.statut=='En attente' %}selected{% endif %}>En attente</option>
                     <option {% if facture.statut=='Payée' %}selected{% endif %}>Payée</option>
                     <option {% if facture.statut=='Non payée' %}selected{% endif %}>Non payée</option>
                 </select>
             </td>
-            <td><input name="commentaire" value="{{ facture.commentaire }}"></td>
+            <td>
+                <input name="commentaire" value="{{ facture.commentaire }}">
+            </td>
             <td>
                 <input type="hidden" name="fichier" value="{{ facture.fichier }}">
                 <button name="action" value="update_statut">💾</button>
