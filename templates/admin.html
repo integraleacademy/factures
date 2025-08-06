@@ -29,7 +29,7 @@
             <td>{{ facture.numero }}</td>
             <td>{{ facture.montant }}</td>
             <td>{{ facture.date_facture }}</td>
-            <td><a href="{{ url_for('download_file', filename=facture.filename) }}">Télécharger</a></td>
+            <td><a href="{{ url_for('download_facture', filename=facture.filename) }}">Télécharger</a></td>
             <td>
                 <select>
                     <option {% if facture.statut == 'En attente' %}selected{% endif %}>En attente</option>
