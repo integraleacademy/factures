@@ -97,8 +97,10 @@
             <td><input name="commentaire" value="{{ facture.commentaire }}"></td>
             <td>
                 <input type="hidden" name="fichier" value="{{ facture.fichier }}">
-                <button name="action" value="update_statut">💾</button>
-                <button name="action" value="delete">🗑️</button>
+                <div class="action-buttons">
+                    <button name="action" value="update_statut">💾</button>
+                    <button name="action" value="delete">🗑️</button>
+                </div>
             </td>
         </tr>
         </form>
