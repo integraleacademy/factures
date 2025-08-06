@@ -1,4 +1,3 @@
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f2f5;
@@ -96,7 +95,6 @@ input[name="commentaire"] {
     font-weight: bold;
 }
 
-
 /* Statut en couleur (menu déroulant stylisé) */
 .statut-select {
     font-weight: bold;
@@ -119,4 +117,14 @@ input[name="commentaire"] {
 
 .btn-red {
     background-color: #e53935;
+}
+
+/* Réduction hauteur des lignes */
+table tr {
+    padding: 4px 0 !important;
+    line-height: 1.2 !important;
+}
+table td, table th {
+    padding: 6px 8px !important;
+    font-size: 14px !important;
 }
