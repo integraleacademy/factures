@@ -155,5 +155,30 @@ def logout():
 def download_facture(filename):
     return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
 
+# ------------------------------------------------------------
+# ✅ Nouvelle route publique : /data.json
+# ------------------------------------------------------------
+@app.route('/data.json')
+def data_json():
+    """
+    Fournit le nombre de factures 'En attente' pour l'affichage
+    sur la plateforme principale.
+    """
+    try:
+        data = load_data()
+        en_attente = [f for f in data if f.get('statut', '').strip().lower() == 'en attente']
+        result = {"count": len(en_attente)}
+        headers = {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+        }
+        return json.dumps(result, ensure_ascii=False), 200, headers
+    except Exception as e:
+        print("Erreur /data.json:", e)
+        return json.dumps({"count": -1}), 500, {
+            "Access-Control-Allow-Origin": "*"
+        }
+
+
 if __name__ == '__main__':
     app.run(debug=True)
