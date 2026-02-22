@@ -142,3 +142,51 @@ table td, table th {
     padding: 4px 6px;
 }
 
+
+.modal-overlay {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top, #ffffff 0%, #eef1f5 60%, #e3e7ed 100%);
+    padding: 20px;
+}
+
+.modal-card {
+    background: #ffffff;
+    max-width: 680px;
+    width: 100%;
+    border-radius: 18px;
+    padding: 40px 32px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+    border: 1px solid #eceff4;
+}
+
+.modal-card h2 {
+    margin-top: 0;
+    color: #101828;
+}
+
+.modal-card p {
+    margin: 14px 0;
+    line-height: 1.55;
+    color: #344054;
+}
+
+.modal-mail a {
+    display: inline-block;
+    color: #0f4c81;
+    font-weight: 700;
+    text-decoration: none;
+    word-break: break-word;
+}
+
+.modal-mail a:hover {
+    text-decoration: underline;
+}
+
+.modal-footnote {
+    margin-top: 24px;
+    font-size: 0.95em;
+    color: #667085;
+}

@@ -43,37 +43,8 @@ def send_mail(nom, email, filename):
     except Exception as e:
         print("Erreur envoi mail :", e)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
-    if request.method == 'POST':
-        nom = request.form['nom']
-        email = request.form['email']
-        numero = request.form['numero']
-        montant = request.form['montant']
-        date_facture = request.form['date']
-        fichier = request.files['fichier']
-
-        if fichier:
-            filename = datetime.now().strftime("%Y%m%d%H%M%S_") + secure_filename(fichier.filename)
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            fichier.save(filepath)
-
-            data = load_data()
-            data.append({
-                'date_envoi': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                'nom': nom,
-                'email': email,
-                'numero': numero,
-                'montant': montant,
-                'date_facture': date_facture,
-                'fichier': filename,
-                'statut': 'En attente',
-                'commentaire': ''
-            })
-            save_data(data)
-            send_mail(nom, email, filename)
-            return render_template('confirmation.html')
-
     return render_template('index.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
