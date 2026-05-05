@@ -6,22 +6,33 @@
     <title>Dépôt de facture - Intégrale Academy</title>
 </head>
 <body>
-    <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="modal-card">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-            <h2 id="modal-title">Les dépôts sont maintenant fermés</h2>
-            <p>
-                Merci d'envoyer désormais vos factures
-                <strong>impérativement au format PDF</strong>
-                à l'adresse suivante :
-            </p>
-            <p class="modal-mail">
-                <a href="mailto:gestion@integraleacademy.com">
-                    gestion@integraleacademy.com
-                </a>
-            </p>
-            <p class="modal-footnote">Le dépôt via ce formulaire n'est plus disponible.</p>
-        </div>
-    </div>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Intégrale Academy">
+    <h2>Dépôt de facture</h2>
+
+    {% if error %}
+    <p style="color: #b42318; font-weight: bold;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        <label for="nom">Nom complet</label>
+        <input type="text" id="nom" name="nom" required>
+
+        <label for="email">Adresse e-mail</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="numero">Numéro de facture</label>
+        <input type="text" id="numero" name="numero" required>
+
+        <label for="montant">Montant TTC</label>
+        <input type="text" id="montant" name="montant" required>
+
+        <label for="date_facture">Date de facture</label>
+        <input type="date" id="date_facture" name="date_facture" required>
+
+        <label for="fichier">Facture PDF</label>
+        <input type="file" id="fichier" name="fichier" accept="application/pdf" required>
+
+        <button type="submit">Envoyer la facture</button>
+    </form>
 </body>
 </html>
