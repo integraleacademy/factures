@@ -43,9 +43,45 @@ def send_mail(nom, email, filename):
     except Exception as e:
         print("Erreur envoi mail :", e)
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST':
+        nom = request.form.get('nom', '').strip()
+        email = request.form.get('email', '').strip()
+        numero = request.form.get('numero', '').strip()
+        montant = request.form.get('montant', '').strip()
+        date_facture = request.form.get('date_facture', '').strip()
+        fichier = request.files.get('fichier')
+
+        if not all([nom, email, numero, montant, date_facture, fichier, fichier.filename]):
+            return render_template('index.html', error="Merci de compléter tous les champs et d'ajouter un fichier PDF.")
+
+        filename = datetime.now().strftime("%Y%m%d%H%M%S_") + secure_filename(fichier.filename)
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        fichier.save(filepath)
+
+        data = load_data()
+        data.append({
+            'date_envoi': datetime.now().strftime('%Y-%m-%d %H:%M'),
+            'nom': nom,
+            'email': email,
+            'numero': numero,
+            'montant': montant,
+            'date_facture': date_facture,
+            'fichier': filename,
+            'statut': 'En attente',
+            'commentaire': ''
+        })
+        save_data(data)
+        send_mail(nom, email, filename)
+
+        return redirect(url_for('confirmation'))
+
     return render_template('index.html')
+
+@app.route('/confirmation')
+def confirmation():
+    return render_template('confirmation.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
@@ -126,9 +162,6 @@ def logout():
 def download_facture(filename):
     return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
 
-# ------------------------------------------------------------
-# ✅ Nouvelle route publique : /data.json
-# ------------------------------------------------------------
 @app.route('/data.json')
 def data_json():
     """
