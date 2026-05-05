@@ -36,6 +36,10 @@
     <h2 style="display: inline-block;">Factures reçues</h2>
     <a href="/logout" style="float: left; margin: 10px;">Déconnexion</a>
     <button onclick="document.getElementById('addModal').style.display='block'" style="float:right; margin: 10px;">➕ Ajouter une facture</button>
+    <form method="POST" style="float:right; margin: 10px;" onsubmit="return confirm('Supprimer toutes les factures ? Cette action est irréversible.');">
+      <input type="hidden" name="action" value="delete_all">
+      <button type="submit" style="background:#b91c1c; color:#fff;">🗑️ Supprimer toutes les factures</button>
+    </form>
 
     <div id="addModal" class="modal">
       <div class="modal-content">

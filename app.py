@@ -120,6 +120,16 @@ def admin():
                 return redirect(url_for('admin'))
 
         action = request.form.get('action')
+
+        if action == 'delete_all':
+            for facture in data:
+                try:
+                    os.remove(os.path.join(UPLOAD_FOLDER, facture['fichier']))
+                except Exception as e:
+                    print("Erreur suppression fichier :", e)
+            save_data([])
+            return redirect(url_for('admin'))
+
         fichier_cible = request.form.get('fichier')
 
         for facture in data:
